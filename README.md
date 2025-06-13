@@ -1,4 +1,4 @@
-# Curso Intensivo de Análisis Multivariante en Genómica Computacional
+# Curso Intensivo de Análisis Multivariante en Metagenómica Computacional
 
 Este curso práctico y especializado está diseñado para formar a investigadores, estudiantes y profesionales en el uso avanzado de técnicas estadísticas multivariantes aplicadas al análisis de datos metagenómicos. 
 A lo largo de cinco días intensivos, los participantes adquieren competencias clave en normalización de datos, análisis de varianzas, y reducción de dimensiones todo ello utilizando R como herramienta principal e integrando buenas prácticas de trabajo colaborativo mediante Git. 
