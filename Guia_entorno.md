@@ -312,7 +312,7 @@ Cada vez que se desee realizar un *commit* se debe dar click en el ícono con el
 De esta manera se puede revisitar cada cambio realizado durante el proceso de edición.
 
 ---
-Pueden ampliar esta breve explicación mediante alguno de los muchos materiales que podéis encontrar por internet.
+Pueden ampliar esta breve explicación mediante alguno de los muchos materiales que pueden encontrar por internet.
 * https://learn.microsoft.com/es-es/windows/wsl/install
 * https://swcarpentry.github.io/git-novice-es/
 * https://git-scm.com/book/en/v2
