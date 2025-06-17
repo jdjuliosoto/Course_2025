@@ -275,38 +275,60 @@ vsd <- varianceStabilizingTransformation(dds, blind = TRUE, fitType = "mean")
 rlog_counts <- assay(vsd)
 ```
 
-### Principal Component Analysis
+### Principal Component Analysis y análisis de cluster
 
 ```R
 library(ggplot2)
+library(mclust)
+
 
 # PCA en datos transformados y normalizados
 pca_data <- prcomp(t(rlog_counts))
+pca_data$x
 
-# Crear un DataFrame con las coordenadas PCA y las fechas
-pca_df <- data.frame(pca_data$x)
-pca_df$season <- feno$date2
 
-# Cambio de nombre a filas
-row.names(pca_data$x) <- c(sprintf("%02d", seq(1, 48)))
+### Analisis de clustering (PCA basado en abundancias funcionales)
+varianza_explicada <- pca_data$sdev^2 / sum(pca_data$sdev^2)
 
-# Graficar el PCA
-ggplot(pca_df, aes(x = PC1, y = PC2, color = season)) +
-  geom_point(size = 4) +
-  labs(title = "", x = "Principal component 1", 
-       y = "Principal component 2", ) +
-  geom_label(aes(label = row.names(pca_data$x)), vjust = -1, hjust = 0.5, size = 4) + 
-  theme_minimal()+
-  theme( panel.grid.major = element_blank(),
-         panel.grid.minor = element_blank(),
-         panel.background = element_blank(),
-         plot.background = element_blank(),
-         axis.line = element_line(color = "black"),
-         legend.position = "none",
-         axis.title.x = element_text(face = "bold", size = 20),
-         axis.title.y = element_text(face = "bold", size = 20))
-  
-# Guardar a 16X10
+# Mostrar la varianza explicada
+print(varianza_explicada)
+head(varianza_explicada, 2)
+sum(varianza_explicada)
+
+# Clusters GMM (Gaussian Mixture Models): Modela los datos como una mezcla de distribuciones gaussianas. A diferencia del k-means, GMM permite clusters con diferentes tamaños, orientaciones y densidades.
+
+set.seed(123)
+# convertir a data.frame
+pca_data <- as.data.frame(pca_data$x)
+
+# ajuste del modelo
+gmm_result <- Mclust(pca_data[, c("PC1", "PC2")])
+
+# volver factor el grupo de clasificación
+pca_data$group <- as.factor(gmm_result$classification)
+
+gmm_result$BIC
+
+# Grafico de PCA 
+ggplot(pca_data, aes(x = PC1, y = PC2, color = group)) + 
+  geom_point(size = 3) +
+  stat_ellipse(type = "t", level = 0.95, linetype = 2, linewidth = 1) +
+  geom_text(aes(label = rownames(pca_data)), color = "black", hjust = 1.25) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    axis.line = element_line(color = "black")
+  ) +
+  labs(title = paste("Log-likelihood: ", round(gmm_result$loglik,2),
+                     "\nBayesian Information Criterion: ", round(gmm_result$bic),
+                     "\n (Next top BIC: VEV 2.24     VVV 1.15     VVE -0.47"), 
+       x = "Principal Component 1 (33%)", y = "Principal Component 2 (20.5%)", color = "Group")
+
+
+# Exportar a 16X 10
 ```
 
 ## Ejemplo de rarefaccion, análisis de distancias y Principal Coordinates Analysis con VEGAN
