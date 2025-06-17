@@ -192,10 +192,11 @@ Normalización ajusta por factores técnicos (profundidad de secuenciación, lon
 A menudo se hacen ambos pasos, y en ese orden: primero normalizar, luego transformar.
 
 
-## Ejemplo de análisis
+## Ejemplo de normalización, transformación, análisis de diferenciación y PCA
 Obtención de los datos
 ```R
-library(dplyr)
+library(tidyverse)
+
 # Crear la matriz de abundancia absoluta
 head(filtered_data)
 
@@ -216,7 +217,7 @@ feno <- filtered_data %>%
   column_to_rownames("sample")
 ```
 
-## Resumen general del análisis con DESeq2
+### Resumen general del análisis con DESeq2
 Tomar matriz de conteos crudos (abundance_matrix)
 → Filas = taxones, columnas = muestras.
 Se construye un objeto DESeqDataSet (dds) con diseño experimental (~ date2)
@@ -228,6 +229,12 @@ Se ejecuta DESeq(dds), lo cual:
 
 ```R
 # Se requiere Biocmanager
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("DESeq2")
+
+# Cargar paquetes
+library(BiocManager)
 library(DESeq2)
 
 ######### Analisis de abundancia diferencial ##########
@@ -242,7 +249,7 @@ dds <- DESeqDataSetFromMatrix(countData = abundance_matrix,
                               colData = feno,
                               design = ~ date2)  # ~1 no factor modelado
 ```
-### ¿Se puede usar ANOVA en lugar de regresión binomial negativa? Por qué?
+#### ¿Se puede usar ANOVA en lugar de regresión binomial negativa? Por qué?
 
 **Acontinuación se procede con dos rutas:**
 1. Por un lado se realiza pruebas estadísticas para diferencias entre grupos. DESeq2 compara los grupos definidos por date2 (por ejemplo, "Breeding season" vs "Hibernation") usando el modelo ajustado. Para esto se usa una prueba de Wald, que evalúa si el log2 fold change (log2FC) entre los grupos es significativamente distinto de cero. El estadístico de Wald se calcula dividiendo el LFC por su error estándar, y este valor se compara con una distribución normal estándar para obtener un valor p.
@@ -268,7 +275,7 @@ vsd <- varianceStabilizingTransformation(dds, blind = TRUE, fitType = "mean")
 rlog_counts <- assay(vsd)
 ```
 
-## Principal Component Analysis
+### Principal Component Analysis
 
 ```R
 library(ggplot2)
@@ -301,6 +308,126 @@ ggplot(pca_df, aes(x = PC1, y = PC2, color = season)) +
   
 # Guardar a 16X10
 ```
+
+## Ejemplo de rarefaccion, análisis de distancias con VEGAN
+
+```R
+# cargar paquetes
+
+library(permute)
+library(lattice)
+library(vegan)
+library(boot)
+
+# Formatear matriz
+
+abundance_matrix_2 <- filtered_data %>%
+  group_by(sample, name) %>%
+  summarise(total_reads = sum(reads, na.rm = TRUE)) %>%
+  pivot_wider(names_from = sample, values_from = total_reads, values_fill = 0) %>%
+  column_to_rownames("name")
+
+dat <- t(abundance_matrix_2)
+
+# Rarefaccion
+# Funcion que genera puntos de rarefaccion para cada muestra
+rarefaction_df <- function(mat, step = 100, max_depth = NULL) {
+  results <- list()
+  for (i in 1:nrow(mat)) {
+    sample_name <- rownames(mat)[i]
+    counts <- mat[i, ]
+    counts <- counts[which(counts > 0)]
+    total_reads <- sum(counts)
+    
+    max_reads <- if (is.null(max_depth)) total_reads else min(max_depth, total_reads)
+    depths <- seq(1, max_reads, by = step)
+    
+    richness <- sapply(depths, function(d) {
+      rarefy(counts, sample = d)
+    })
+    
+    df <- data.frame(
+      Sample = sample_name,
+      Depth = depths,
+      Richness = richness
+    )
+    
+    results[[i]] <- df
+  }
+  
+  do.call(rbind, results)
+}
+
+# Profundidad de corte (probar distintos puntos de corte)
+min_depth <- 6000
+
+# Generar el dataframe para ggplot
+rarefaction_data <- rarefaction_df(dat, step = 100, max_depth = min_depth)
+
+ggplot(rarefaction_data, aes(x = Depth, y = Richness, color = Sample)) +
+  geom_line(size = 1) +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.line = element_line(color = "black"),
+        axis.text.y = element_text(size = 18),
+        axis.text.x = element_text(size = 18),
+        axis.title = element_text(size = 20, face = "bold")) +
+  labs(title = "",
+       x = "Number of reads",
+       y = "Estimated richness (number of orders)") 
+
+# Guardar a 16X10
+```
+### Análisis de diversidad beta
+
+```R
+# Normalizacion por TSS -Total Sum Scaling- y transformacion
+tss_matrix <- sweep(abundance_matrix, 1, rowSums(abundance_matrix), "/")
+hellinger_data <- decostand(tss_matrix, method = "hellinger")
+
+# Analisis de diversidad Beta
+bray_dist <- vegdist(t(hellinger_data), method = "bray") # abundancias
+jaccard_dist <- vegdist(t(hellinger_data), method = "jaccard") # presencia de especies
+euclidean_dist <- dist(t(hellinger_data), method = "euclidean") # abundancias normalizadas, muy sensible a diferencias extremas
+
+# a matrices de distancias
+bray_matrix <- as.matrix(bray_dist)
+jaccard_matrix <- as.matrix(jaccard_dist)
+euclidean_matrix <- as.matrix(euclidean_dist)
+```
+
+### Principal Coordinates Analysis
+
+```R
+# Visualizacion PCoA (Principal Coordinates Analysis)
+pcoa_res <- cmdscale(beta_dist, eig = TRUE, k = 2)
+
+# Calcular varianza explicada
+var_explained <- round(100 * pcoa_res$eig / sum(pcoa_res$eig), 2)
+
+# cambiar nombre de filas
+row.names(pcoa_res$points) <- c(sprintf("%02d", seq(1,48)))
+
+# Graficar
+plot(pcoa_res$points, col = feno$date2, pch = 19,
+     xlab = paste0("PCoA 1 (", var_explained[1], "%)"),
+     ylab = paste0("PCoA 2 (", var_explained[2], "%)"),
+     main = "")
+text(pcoa_res$points[,1], pcoa_res$points[,2], 
+     labels = rownames(pcoa_res$points), pos = 2, cex = 0.8)
+
+# Elipses por grupo de fecha
+ordiellipse(pcoa_res$points, feno$date2, kind = "sd", draw = "polygon",
+            col = c("grey","red"), alpha = 50, label = FALSE,
+            border = c("grey","red"))
+
+# Graficar a 16 X 10
+
+# Analisis estadistico PERMANOVA (Permutational Multivariate Analysis of Variance)
+adonis2(bray_dist ~ date2, data = feno, permutations = 999)
+```
+
+
 #### Referencias
 
 1. Bolstad, B. M., et al. (2003). A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. Bioinformatics, 19(2), 185–193.
