@@ -90,7 +90,7 @@ Combat (Johnson et al., 2007), SVA (Surrogate Variable Analysis; Leek et al., 20
 
 -- Métodos más comúnes:
 
-*Dentro de muestras*
+## *Dentro de muestras*
 
 **Counts Per Million (CPM):** es un método de normalización de datos de conteo que ajusta los valores para tener en cuenta la profundidad total de secuenciación.
 Normaliza los datos de ARN-seq según la profundidad de secuenciación, pero no según la longitud del gen. Por lo tanto, aunque se trata de un método de normalización intramuestral, la normalización por CPM no es adecuada para comparaciones intramuestrales de la expresión génica.
@@ -119,7 +119,7 @@ Limitaciones
 * No es adecuado para análisis diferencial estadísticamente robusto.
 * No se recomienda si el objetivo es detectar cambios absolutos entre condiciones.
 
-*Entre muestras*
+## *Entre muestras*
 
 **Rarefacción:** es una técnica que se usa para igualar el número de lecturas (reads) entre diferentes muestras. La rarefacción consiste en submuestrear aleatoriamente cada muestra para igualar todas a una profundidad de secuenciación común y baja , llamada profundidad de rarefacción.
 Si existen tres muestras con valores de 30 kb, 40 kb y 10 kb la rarefacción tomaría solo 10,000 reads de cada una.
@@ -158,6 +158,10 @@ Limitaciones
 * No es adecuado para análisis diferencial basado en modelos estadísticos como DESeq2 o edgeR, ya que altera la estructura de varianza-media.
 * Solo debe aplicarse a datos transformados (ej: log2), no a conteos brutos.
 
+**DESeq2:** calcula el factor de normalización por profundidad de secuenciación. Utiliza la mediana del cociente por gen (median-of-ratios method). Luego estima la dispersión para cada taxón.
+Calcula la media geométrica para cada taxón (fila) entre todas las muestras. Para cada muestra, divide cada conteo por la media geométrica de ese taxón. El factor de normalización de cada muestra es la mediana de esos cocientes (ignorando genes con media geométrica cero).
+
+Esto corrige por diferencias de profundidad de secuenciación y composición global.
 
 ## Transformación
 En muchos análisis estadísticos tradicionales (como regresión, ANOVA, PCA, etc.), se asumen ciertos supuestos sobre la distribución de los datos. 
@@ -175,10 +179,6 @@ Los principales supuestos que intentamos satisfacer al aplicar una transformaci�
 * Linealidad : En modelos predictivos o correlacionales, se espera una relación lineal entre variables.
 * Estabilidad de varianza : Especialmente importante en datos donde la varianza aumenta con la media (como conteos de reads).
 
-**DESeq2:** calcula el factor de normalización por profundidad de secuenciación. Utiliza la mediana del cociente por gen (median-of-ratios method). Luego estima la dispersión para cada taxón.
-Calcula la media geométrica para cada taxón (fila) entre todas las muestras. Para cada muestra, divide cada conteo por la media geométrica de ese taxón. El factor de normalización de cada muestra es la mediana de esos cocientes (ignorando genes con media geométrica cero).
-
-Esto corrige por diferencias de profundidad de secuenciación y composición global.
 
 #### Tipos comunes de transformaciones
 
@@ -309,7 +309,7 @@ ggplot(pca_df, aes(x = PC1, y = PC2, color = season)) +
 # Guardar a 16X10
 ```
 
-## Ejemplo de rarefaccion, análisis de distancias con VEGAN
+## Ejemplo de rarefaccion, análisis de distancias y Principal Coordinates Analysis con VEGAN
 
 ```R
 # cargar paquetes
