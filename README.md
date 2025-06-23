@@ -2,7 +2,7 @@
 
 Este curso práctico y especializado está diseñado para formar a investigadores, estudiantes y profesionales en el uso avanzado de técnicas estadísticas multivariantes aplicadas al análisis de datos metagenómicos. 
 A lo largo de cinco días intensivos, los participantes adquieren competencias clave en normalización de datos, análisis de varianzas, y reducción de dimensiones todo ello utilizando R como herramienta principal e integrando buenas prácticas de trabajo colaborativo mediante Git. 
-El contenido combina fundamentos teóricos con sesiones prácticas guiadas, donde se abordan desde métodos clásicos como ANOVA, PCA y K-means, hasta su implementación en estudios reales con herramientas como DESeq2, limma, vegan. Además, se introducen conceptos esenciales de pipelines bioinformáticos, control de versiones y análisis reproducibles, preparando al estudiante para trabajar en entornos científicos modernos y colaborativos. 
+El contenido combina fundamentos teóricos con sesiones prácticas guiadas, donde se abordan desde métodos clásicos como PCA y K-means, hasta su implementación en estudios reales. Además, se introducen conceptos esenciales de pipelines bioinformáticos, control de versiones y análisis reproducibles, preparando al estudiante para trabajar en entornos científicos modernos y colaborativos. 
 El curso es ideal para quienes buscan consolidar sus habilidades analíticas en contextos de secuenciación masiva y biología computacional.
 
 
