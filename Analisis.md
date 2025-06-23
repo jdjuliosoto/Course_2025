@@ -236,7 +236,19 @@ BiocManager::install("DESeq2")
 # Cargar paquetes
 library(BiocManager)
 library(DESeq2)
+library(vsn)
+library(hexbin)
 
+### Exploracion
+
+meanSdPlot(as.matrix(abundance_matrix[,2:49]), xlab = "Taxa", ylab = "Desviación estandar")
+boxplot(abundance_matrix[,2:49], las = 2, cex.axis = 0.7)
+
+```
+Los datos descargados no han sido previamente normalizados ni han sufrido una transformación. En datos de secuenciación crudos, los genes con medias altas suelen tener varianza muy alta, y los genes poco expresados, varianza muy baja.
+
+Se procede a realizar una normalización por Deseq y a ajustar el modelo binomial negativo de la distribución de la abundancia de conteos.
+```R
 ######### Analisis de abundancia diferencial ##########
 
 # se crea un data frame con la matriz de abundancia
@@ -249,7 +261,6 @@ dds <- DESeqDataSetFromMatrix(countData = abundance_matrix,
                               colData = feno,
                               design = ~ date2)  # ~1 no factor modelado
 ```
-
 **Acontinuación se procede con dos rutas:**
 1. Por un lado se realiza pruebas estadísticas para diferencias entre grupos. DESeq2 compara los grupos definidos por date2 (por ejemplo, "Breeding season" vs "Hibernation") usando el modelo ajustado. Para esto se usa una prueba de Wald, que evalúa si el log2 fold change (log2FC) entre los grupos es significativamente distinto de cero. El estadístico de Wald se calcula dividiendo el LFC por su error estándar, y este valor se compara con una distribución normal estándar para obtener un valor p.
 
@@ -272,18 +283,95 @@ Se obtiene una matriz con varianza aproximadamente constante lista para PCA, clu
 # Transformacion vst (Variance Stabilizing Transformation)
 vsd <- varianceStabilizingTransformation(dds, blind = TRUE, fitType = "mean")
 rlog_counts <- assay(vsd)
+
+# verifica si existen NA y los nombres de las columnas
+sum(is.na(rlog_counts))
+colnames(rlog_counts)
+
+# Evalua la estabilización de la varianza
+boxplot(rlog_counts, las = 2, cex.axis = 0.7)
+meanSdPlot(rlog_counts, xlab = "Taxa", ylab = "Desviación estandar")
+
 ```
 
 ### Principal Component Analysis y análisis de cluster
-Manual
+La escala de las variables numéricas es homogénea, y los datos son del mismo tipo (conteos de abundancia) por lo que nos basaremos en la matriz de covarianzas de los datos centrados.
+
+#### Covarianza
+
+La covarianza entre dos variables aleatorias $X$ y $Y$ se define como:
+
+$$
+\text{Cov}(X, Y) = \frac{1}{n - 1} \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})
+$$
+
+- $X_i$, $Y_i$: valores individuales de cada variable.
+
+- $Xˉ$, $Yˉ$: medias de las variables X y Y, respectivamente.
+
+- $n$: número total de observaciones.
+
+- Se usa $n−1$ para calcular la covarianza muestral; si es poblacional, usaría $n$.
+
+
 ```R
+
+dat_scaled <- scale(t(rlog_counts), center = T, scale = F) 
+
+```
+#### Por qué scale = FALSE? Relación entre covarianza y correlación
+A partir de una matriz de covarianzas, podemos obtener la matriz de correlaciones. El coeficiente de correlación entre dos variables $j$ y $k$ se define como:
+
+$$
+r_{jk} = \frac{c_{jk}}{s_j s_k}
+$$
+
+donde:
+- $r_{jk}$: coeficiente de correlación
+- $c_{jk}$: covarianza entre las variables $j$ y $k$
+- $s_j$, $s_k$: desviaciones estándar de las variables $j$ y $k$
+
+Calculamos la matriz de varianzas ajustando a dividir por n en vez de por (n-1) para que los resultados sean comparables con la matriz de correlación.
+
+* En estadística inferencial, al estimar la covarianza poblacional a partir de una muestra, se usa n−1 para corregir el sesgo (“grados de libertad”). En PCA, sin embargo, no estamos estimando, sino describiendo la estructura interna de esos mismos datos. Queremos la “matriz de momentos de segundo orden” sin corrección de sesgo.
+
+```R
+n <- dim(abundance_matrix)[1]
+S <-cov(dat_scaled)
+S1 <- cov(dat_scaled)*(n-1)/n
+show(S)
+```
+
+Calculando las componentes principales con funciones básicas
+
+#### mediante la diagonalización de la matriz de varianza
+
+```R
+# calculando eigenvalues y eigenvectores
+EIG <- eigen(S)
+show(EIG)
+
+# multiplicar la matriz original por la matriz de vectores propios
+eigenVecs1 <- EIG$vectors
+PCAS1 <- dat_scaled %*% eigenVecs1
+head(PCAS1)
+
+# Calcular porcentaje de variabilidad explicado.
+vars1<- EIG$values/sum(EIG$values)
+round(vars1,3)
+
+# Graficar
+xlabel <- paste("PCA1 ", round(vars1[1]*100, 2),"%" )
+ylabel <- paste("PCA2 ", round(vars1[2]*100,2),"%" )
+plot(PCAS1[,1], PCAS1[,2], main = "2 primeras PCs",
+     xlab=xlabel, ylab=ylabel)
 
 ```
 
+Calculando las componentes principales con funciones de R
 ```R
 library(ggplot2)
 library(mclust)
-
 
 # PCA en datos transformados y normalizados
 pca_data <- prcomp(t(rlog_counts))
