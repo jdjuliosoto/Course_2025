@@ -24,7 +24,6 @@ Conferencista: Manuel Barrios (15:00-16:00)
 
 ### Día 2: 
 #### Mañana (2h): Teoría
-•	Análisis de varianza (ANOVA): fundamentos, supuestos, interpretación biológica
 •	Regresión logística en series temporales
 
 #### Tarde (6h): Práctica
@@ -37,17 +36,14 @@ Conferencista: Manuel Barrios (15:00-16:00)
 •	K-means: algoritmo, interpretación.
 
 #### Tarde (6h): Práctica
-•	ANOVA en RNA-seq: diseño experimental y análisis con DESeq2 y lima
-•	Suavización de varianza
-
+•	Distancia de Mahalanobis: análisis de diversidad beta, visualización en mapas de distancia
+•	Transformación de datos (Transformación Z, logarítmica, exponencial)
 
 ### Día 4: 
 #### Mañana (2h): Teoría
 •	Análisis de componentes principales
 
 #### Tarde (6h): Práctica
-•	Distancia de Mahalanobis: análisis de diversidad beta, visualización en mapas de distancia
-•	Transformación de datos (Transformación Z, logarítmica, exponencial)
 •	PCA en análisis funcional: cálculo, y visualización
 
 Conferencista: Andrea Rodas (16:00-17:00)
