@@ -249,7 +249,6 @@ dds <- DESeqDataSetFromMatrix(countData = abundance_matrix,
                               colData = feno,
                               design = ~ date2)  # ~1 no factor modelado
 ```
-#### ¿Se puede usar ANOVA en lugar de regresión binomial negativa? Por qué?
 
 **Acontinuación se procede con dos rutas:**
 1. Por un lado se realiza pruebas estadísticas para diferencias entre grupos. DESeq2 compara los grupos definidos por date2 (por ejemplo, "Breeding season" vs "Hibernation") usando el modelo ajustado. Para esto se usa una prueba de Wald, que evalúa si el log2 fold change (log2FC) entre los grupos es significativamente distinto de cero. El estadístico de Wald se calcula dividiendo el LFC por su error estándar, y este valor se compara con una distribución normal estándar para obtener un valor p.
@@ -276,6 +275,10 @@ rlog_counts <- assay(vsd)
 ```
 
 ### Principal Component Analysis y análisis de cluster
+Manual
+```R
+
+```
 
 ```R
 library(ggplot2)
