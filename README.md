@@ -36,7 +36,6 @@ Conferencista: Manuel Barrios (15:00-16:00)
 •	K-means: algoritmo, interpretación.
 
 #### Tarde (6h): Práctica
-•	Distancia de Mahalanobis: análisis de diversidad beta, visualización en mapas de distancia
 •	Transformación de datos (Transformación Z, logarítmica, exponencial)
 
 ### Día 4: 
@@ -44,17 +43,17 @@ Conferencista: Manuel Barrios (15:00-16:00)
 •	Análisis de componentes principales
 
 #### Tarde (6h): Práctica
-•	PCA en análisis funcional: cálculo, y visualización
+•	PCA en análisis metagenómico: cálculo, y visualización
 
 Conferencista: Andrea Rodas (16:00-17:00)
 
 
 ### Día 5: 
 #### Mañana (2h): Teoría
-•	Matemáticas de la IA: clusterización y autómatas
+•	Análisis de componentes principales
 
 #### Tarde (6h)
-•	PCA en análisis funcional: cálculo, y visualización con paquetes
+•	Distancia de Mahalanobis: análisis de diversidad beta, visualización en mapas de distancia
 •	PERMANOVA en PCoA para la comparación de comunidades con vegan
 
 ## Requisitos técnicos y académicos
