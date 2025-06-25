@@ -582,16 +582,16 @@ En metagenómica, una situación común es aquella en la que la similitud o dist
 
 
 - Índice de coincidencia simple:  
-  a / (a + d + n)
+  $$a / (a + d + n)$$
 
 - Índice de Ochiai:  
-  a / √[(a + b)(a + c)]
+  $$a / √[(a + b)(a + c)]$$
 
 - Índice de Dice-Sørensen:  
-  2a / (2a + b + c)
+  $$2a / (2a + b + c)$$
 
 - Índice de Jaccard:  
-  a / (a + b + c)
+  $$a / (a + b + c)$$
 
 Todos estos varían de cero (sin similitud) a uno (similitud completa), por lo que las medidas de distancia complementarias se pueden calcular restando los índices de similitud de uno.
 
