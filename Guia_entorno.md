@@ -86,8 +86,9 @@ cd /mnt/c/Users/usuario/Documents/proyecto_genomico
 
 En los últimos años, la forma en que trabajamos con código, datos y documentación ha evolucionado significativamente. En el ámbito del análisis de datos genómicos, donde los proyectos suelen involucrar múltiples archivos (scripts de R, archivos FASTQ, BAM, VCF, anotaciones, resultados intermedios, visualizaciones, etc.), es fundamental contar con una estructura organizada y reproducible.
 
-Una herramienta clave para lograrlo es el uso de repositorios bajo control de versiones , y dentro de estas herramientas, Git se ha convertido en un estándar ampliamente adoptado. Combinado con plataformas como GitHub , Git permite no solo organizar mejor nuestros proyectos, sino también colaborar, compartir y mantener un historial claro de los cambios realizados a lo largo del tiempo.
-¿Qué es un repositorio? Un repositorio (o repo , por sus siglas en inglés) es un espacio centralizado donde se almacenan los archivos de un proyecto junto con su historial completo de cambios .
+Una herramienta clave para lograrlo es el uso de repositorios bajo control de versiones, y dentro de estas herramientas, Git se ha convertido en un estándar ampliamente adoptado. Combinado con plataformas como GitHub, Git permite no solo organizar mejor nuestros proyectos, sino también colaborar, compartir y mantener un historial claro de los cambios realizados a lo largo del tiempo.
+
+¿Qué es un repositorio? Un repositorio (o repo, por sus siglas en inglés) es un espacio centralizado donde se almacenan los archivos de un proyecto junto con su historial completo de cambios.
 
 Se puede pensar como una carpeta inteligente que no solo guarda los archivos actuales, sino también:
 
