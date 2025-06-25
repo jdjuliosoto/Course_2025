@@ -197,6 +197,10 @@ Obtención de los datos
 ```R
 library(tidyverse)
 
+# Leer datos
+filtered_data <- read.csv("data.csv", header = T, sep = ",")
+filtered_data <- filtered_data[,-1]
+
 # Crear la matriz de abundancia absoluta
 head(filtered_data)
 
@@ -216,17 +220,20 @@ feno <- filtered_data %>%
   ) %>%
   column_to_rownames("sample")
 ```
-
-### Resumen general del análisis con DESeq2
+<details> 
+   <summary> Resumen general del análisis con DESeq2 </summary>
 Tomar matriz de conteos crudos (abundance_matrix)
 → Filas = taxones, columnas = muestras.
 Se construye un objeto DESeqDataSet (dds) con diseño experimental (~ date2)
 
-Se ejecuta DESeq(dds), lo cual:
+Si se ejecuta DESeq(dds):
  * Normaliza por tamaño de biblioteca (usa size factors). 
  * Estima dispersión de cada taxón (cuánto varía su abundancia entre muestras dentro del mismo grupo).
  * Ajusta modelos negativos binomiales por taxón (los datos de conteo no siguen una distribución normal, sino una binomial negativa).
 
+</details>
+
+Veamos un ejemplo con Deseq:
 ```R
 # Se requiere Biocmanager
 if (!require("BiocManager", quietly = TRUE))
@@ -240,7 +247,6 @@ library(vsn)
 library(hexbin)
 
 ### Exploracion
-
 meanSdPlot(as.matrix(abundance_matrix[,2:49]), xlab = "Taxa", ylab = "Desviación estandar")
 boxplot(abundance_matrix[,2:49], las = 2, cex.axis = 0.7)
 
@@ -261,23 +267,9 @@ dds <- DESeqDataSetFromMatrix(countData = abundance_matrix,
                               colData = feno,
                               design = ~ date2)  # ~1 no factor modelado
 ```
-**Acontinuación se procede con dos rutas:**
-1. Por un lado se realiza pruebas estadísticas para diferencias entre grupos. DESeq2 compara los grupos definidos por date2 (por ejemplo, "Breeding season" vs "Hibernation") usando el modelo ajustado. Para esto se usa una prueba de Wald, que evalúa si el log2 fold change (log2FC) entre los grupos es significativamente distinto de cero. El estadístico de Wald se calcula dividiendo el LFC por su error estándar, y este valor se compara con una distribución normal estándar para obtener un valor p.
-
-```R
-# nombres de los coeficientes disponibles en el objeto con los resultados
-resultsNames(dds)
-
-# Se extraen los valores de interés que son distintos significativamente para el contraste especificado
-res <- results(dds, name = "date2_Breeding_season_vs_Hibernation_season", alpha = 0.05) # Breeding como categoría de referencia y ajuste por FDR en 0.05
-
-# filtro solo los significativos luego del ajuste por FDR
-dif_spec <- res[!is.na(res$pvalue) & res$pvalue < 0.05,]
-dif_spec
-```
-2. Por otro lado se transforma los datos con VST (varianceStabilizingTransformation): La varianza deja de depender fuertemente de la media, algo que sí ocurre en datos de conteo sin transformar.
+Se transforma los datos con VST (varianceStabilizingTransformation): La varianza deja de depender fuertemente de la media, algo que sí ocurre en datos de conteo sin transformar. Se obtiene una matriz con varianza aproximadamente constante lista para PCA, clustering, ANOVA exploratoria, etc.
 * blind = TRUE: ignora el diseño experimental al transformar si solo se quiere explorar la variabilidad global. Si se quisiera comparar grupos, blind = FALSE.
-Se obtiene una matriz con varianza aproximadamente constante lista para PCA, clustering, ANOVA exploratoria, etc.
+* 
 
 ```R
 # Transformacion vst (Variance Stabilizing Transformation)
@@ -292,6 +284,66 @@ colnames(rlog_counts)
 boxplot(rlog_counts, las = 2, cex.axis = 0.7)
 meanSdPlot(rlog_counts, xlab = "Taxa", ylab = "Desviación estandar")
 
+```
+
+### Pruebas estadísticas para diferencias entre grupos.
+
+Cuando se recopilan datos para varias variables en las mismas unidades muestrales, siempre es posible examinar las variables una por una en lo que respecta a las pruebas de significancia. Desafortunadamente, este enfoque simple presenta una desventaja debido al uso repetido de pruebas de significancia, cada una de las cuales tiene cierta probabilidad de llevar a una conclusión errónea.
+
+Para evaluar si las varianzas entre grupos son iguales (suposición de homocedasticidad), utilizamos la prueba de Levene.
+- **Hipótesis nula ($H_0$):** Las varianzas son iguales entre los grupos.
+- **Hipótesis alternativa ($H_1$):** Al menos una varianza es diferente.
+  
+```R
+rlog_counts # matriz
+feno # factor
+
+# Prueba t univariante de dos muestras. Para un solo taxón (por ejemplo, la fila 1)
+library(car)
+leveneTest(rlog_counts[1, ], feno$date2) # prueba de homocedasticidad
+t.test(rlog_counts[1, ] ~ feno$date2, var.equal = FALSE)
+```
+Es posible determinar cuál de estas variables, si alguna, parece haber tenido valores medios diferentes para los grupos de comparación. Sin embargo, además de estas pruebas, también podría ser interesante saber si todas las variables consideradas en conjunto sugieren una diferencia entre los grupos comparados.
+Para responder a esta pregunta se necesita una prueba multivariante. Una posibilidad es la prueba T2 de Hotelling. El estadístico utilizado es entonces una generalización del estadístico t. 
+
+Para evaluar si las matrices de covarianza entre grupos son iguales (suposición de homocedasticidad), utilizamos la prueba de Box.
+- **Hipótesis nula ($H_0$):** Las matrices de covarianza son iguales entre los grupos.
+- **Hipótesis alternativa ($H_1$):** Las matrices de covarianza son distintas entre los grupos.
+  
+```R
+#Box’s M-test (homogeneidad de matrices de covarianza)
+library(biotools)
+# Requiere que cada nivel del factor tenga n <= p. Asegurarse de que p < n_grupo.
+boxM(t(rlog_counts[1:12, ]), feno$date2)
+
+# Hotelling’s T² (multivariado, dos grupos)
+# Subset de taxa para cumplir n > p, por ejemplo los 12 primeros
+
+library(Hotelling)
+library(corpcor)
+hotel_resp <- hotelling.test(t(rlog_counts[1:12, ]) ~ feno$date2)
+hotel_resp
+```
+Casos que involucran la clasificación de observaciones en función de *uno o más factores*, y que incluyen *múltiples variables respuesta*, pueden analizarse mediante una generalización del análisis de varianza conocida como **Análisis Multivariado de Varianza (MANOVA)**. 
+
+```R
+# MANOVA (multivariado, dos grupos).
+response <- t(rlog_counts[1:13, ]) # Subset para reducir dimensionalidad
+manova_model <- manova(response ~ feno$date2)
+summary(manova_model, test = "Wilks")
+```
+Utilizando DESeq2: DESeq2 compara los grupos definidos por date2 (por ejemplo, "Breeding season" vs "Hibernation") usando el modelo ajustado. Para esto se usa una prueba de Wald, que evalúa si el log2 fold change (log2FC) entre los grupos es significativamente distinto de cero. El estadístico de Wald se calcula dividiendo el LFC por su error estándar, y este valor se compara con una distribución normal estándar para obtener un valor p.
+
+```R
+# nombres de los coeficientes disponibles en el objeto con los resultados
+resultsNames(dds)
+
+# Se extraen los valores de interés que son distintos significativamente para el contraste especificado
+res <- results(dds, name = "date2_Breeding_season_vs_Hibernation_season", alpha = 0.05) # Breeding como categoría de referencia y ajuste por FDR en 0.05
+
+# filtro solo los significativos luego del ajuste por FDR
+dif_spec <- res[!is.na(res$pvalue) & res$pvalue < 0.05,]
+dif_spec
 ```
 
 ### Principal Component Analysis y análisis de cluster
@@ -386,7 +438,8 @@ print(varianza_explicada)
 head(varianza_explicada, 2)
 sum(varianza_explicada)
 
-# Clusters GMM (Gaussian Mixture Models): Modela los datos como una mezcla de distribuciones gaussianas. A diferencia del k-means, GMM permite clusters con diferentes tamaños, orientaciones y densidades.
+# Clusters GMM (Gaussian Mixture Models): Modela los datos como una mezcla de distribuciones gaussianas.
+# A diferencia del k-means, GMM permite clusters con diferentes tamaños, orientaciones y densidades.
 
 set.seed(123)
 # convertir a data.frame
@@ -491,16 +544,69 @@ ggplot(rarefaction_data, aes(x = Depth, y = Richness, color = Sample)) +
 
 # Guardar a 16X10
 ```
-### Análisis de diversidad beta
+## Distancias
+### Distancia de Mahalanobis
+Cuando existen más variables (p) que observaciones (n), el cálculo estándar de la distancia de Mahalanobis falla porque la matriz de covarianza $Σ$ es singular (no invertible), un caso extremadamente común en metagenómica.
+
+$$D²(x) = (x − μ)ᵀ Σ⁻¹ (x − μ)$$
+
+Donde:
+- `x`: vector de observaciones
+- `μ`: vector de medias
+- `Σ`: matriz de covarianza
+- `Σ⁻¹`: inversa de la matriz de covarianza
+
+Si p >= n (número de variables >= número de muestras),
+entonces Sigma es singular → Sigma⁻¹ no existe.
+
+Se puede solucionar a través de la reducción del número de dimensiones utilizando un subconjunto de taxa (por ejemplo, los más variables o relevantes), o utilizando una estimación regularizada de la matriz de covarianza, que es invertible incluso si p > n.
+
+```R
+library(corpcor)
+
+# Transponer: filas = observaciones
+rlog_counts_t <- t(rlog_counts)
+
+# Calcular matriz de covarianza regularizada (shrinkage)
+cov_shrink <- cov.shrink(rlog_counts_t)
+
+# Media
+mu <- colMeans(rlog_counts_t)
+
+# Calcular distancia de Mahalanobis regularizada
+mahal_dist <- mahalanobis(rlog_counts_t, center = mu, cov = cov_shrink)
+
+```
+### Análisis de distancia para presencias ausencias (diversidad beta)
+En metagenómica, una situación común es aquella en la que la similitud o distancia entre dos elementos debe basarse en una lista de sus presencias y ausencias. Existen medidas de similitud de uso común como:
+
+
+- Índice de coincidencia simple:  
+  a / (a + d + n)
+
+- Índice de Ochiai:  
+  a / √[(a + b)(a + c)]
+
+- Índice de Dice-Sørensen:  
+  2a / (2a + b + c)
+
+- Índice de Jaccard:  
+  a / (a + b + c)
+
+Todos estos varían de cero (sin similitud) a uno (similitud completa), por lo que las medidas de distancia complementarias se pueden calcular restando los índices de similitud de uno.
+
 
 ```R
 # Normalizacion por TSS -Total Sum Scaling- y transformacion
-tss_matrix <- sweep(abundance_matrix, 1, rowSums(abundance_matrix), "/")
-hellinger_data <- decostand(tss_matrix, method = "hellinger")
+tss_matrix <- sweep(abundance_matrix, 1, rowSums(abundance_matrix), "/") # Normalización
+hellinger_data <- decostand(tss_matrix, method = "hellinger") # Suaviza las diferencias grandes entre abundancias
 
-# Analisis de diversidad Beta
+# Transformación a presencia/ausencia para índices binarios
+pa_matrix <- (abundance_matrix > 0) * 1
+
+# Analisis de diversidad Beta. vegdist ya devuelve 1 - Índice de similitud
 bray_dist <- vegdist(t(hellinger_data), method = "bray") # abundancias
-jaccard_dist <- vegdist(t(hellinger_data), method = "jaccard") # presencia de especies
+jaccard_dist <- vegdist(t(pa_matrix), method = "jaccard") # presencia/ausencia
 euclidean_dist <- dist(t(hellinger_data), method = "euclidean") # abundancias normalizadas, muy sensible a diferencias extremas
 
 # a matrices de distancias
@@ -509,7 +615,11 @@ jaccard_matrix <- as.matrix(jaccard_dist)
 euclidean_matrix <- as.matrix(euclidean_dist)
 ```
 
+
 ### Principal Coordinates Analysis
+La ordenación describe el proceso de producir un pequeño número de variables que pueden utilizarse para describir la relación entre un grupo de objetos, a partir de una matriz de distancias o similitudes entre los objetos, o de los valores de algunas variables medidas en cada objeto. Un ejemplo es la utilización de los primeros dos componentes principales construidos con anterioridad. En biología, se utiliza con mayor frecuencia para resumir las relaciones entre diferentes especies, determinadas a partir de su abundancia en diferentes ubicaciones, o, alternativamente, para resumir las relaciones entre diferentes ubicaciones a partir de la abundancia de diferentes especies en dichas ubicaciones. 
+
+El análisis de coordenadas principales (Principal Coordinates Analysis) es otra manera de resumir las relaciones de interés. El análisis de coordenadas principales utiliza un enfoque de valores propios que puede considerarse una generalización del análisis de componentes principales. Parte de una matriz de distancias entre varios objetos y buscan determinar ejes de ordenación de manera que las posiciones de los objetos en una configuración t-dimensional no coinciden con las distancias o similitudes originales.
 
 ```R
 # Visualizacion PCoA (Principal Coordinates Analysis)
@@ -555,3 +665,5 @@ adonis2(bray_dist ~ date2, data = feno, permutations = 999)
 10. Zhao, S., Ye, Z. and Stanton, R. (2020) ‘Misuse of RPKM or TPM normalization when comparing across samples and sequencing protocols’. Rna, 26(8), pp.903-909. Available at: 10.1261/rna.074922.120.
 11. Quinn, T. P., Erb, I., Richardson, M. F., & Crowley, T. M. (2018). Understanding sequencing data as compositions: an outlook and review. Bioinformatics, 34(16), 2870–2878.
 https://doi.org/10.1093/bioinformatics/bty175
+12. Manly BF, Alberto JA. Multivariate statistical methods: a primer. Chapman and Hall/CRC; 2016 Nov 3.
+13. Jolliffe, I. T. (2002). Principal Component Analysis (2nd ed.). New York: Springer-Verlag.
