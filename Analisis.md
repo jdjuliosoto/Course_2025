@@ -663,7 +663,6 @@ adonis2(bray_dist ~ date2, data = feno, permutations = 999)
 8. Robinson, M. D., & Oshlack, A. (2010). A scaling normalization method for differential expression analysis of RNA-seq data. Genome Biology, 11(3), R25.
 9. Zhao, S., et al. (2021). Evaluation of two main RNA-seq approaches for gene quantification in clinical RNA sequencing. NPJ Genomic Medicine, 6(1), 1–10.
 10. Zhao, S., Ye, Z. and Stanton, R. (2020) ‘Misuse of RPKM or TPM normalization when comparing across samples and sequencing protocols’. Rna, 26(8), pp.903-909. Available at: 10.1261/rna.074922.120.
-11. Quinn, T. P., Erb, I., Richardson, M. F., & Crowley, T. M. (2018). Understanding sequencing data as compositions: an outlook and review. Bioinformatics, 34(16), 2870–2878.
-https://doi.org/10.1093/bioinformatics/bty175
+11. Quinn, T. P., Erb, I., Richardson, M. F., & Crowley, T. M. (2018). Understanding sequencing data as compositions: an outlook and review. Bioinformatics, 34(16), 2870–2878. https://doi.org/10.1093/bioinformatics/bty175
 12. Manly BF, Alberto JA. Multivariate statistical methods: a primer. Chapman and Hall/CRC; 2016 Nov 3.
 13. Jolliffe, I. T. (2002). Principal Component Analysis (2nd ed.). New York: Springer-Verlag.
