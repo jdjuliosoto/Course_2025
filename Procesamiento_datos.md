@@ -91,3 +91,6 @@ blastn -query deduped.fastq -db VFDB \
   -perc_identity 95 -evalue 1e-10 \
   -num_threads 8 -out vf_hits.tsv
 ```
+Las secuencias genómicas deben formatearse de acuerdo con el Consorcio de Estándares Genómicos (GSC) y seguir la especificación de información mínima sobre una secuencia del genoma (MIGS). Para más información ver:
+
+https://www.gensc.org
