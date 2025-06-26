@@ -91,6 +91,17 @@ blastn -query deduped.fastq -db VFDB \
   -perc_identity 95 -evalue 1e-10 \
   -num_threads 8 -out vf_hits.tsv
 ```
-Las secuencias genómicas deben formatearse de acuerdo con el Consorcio de Estándares Genómicos (GSC) y seguir la especificación de información mínima sobre una secuencia del genoma (MIGS). Para más información ver:
+## Datos que debemos registrar de acuerdo a formulario MIxS
+Las secuencias genómicas deben formatearse de acuerdo con el Consorcio de Estándares Genómicos (GSC) y seguir la especificación de información mínima sobre una secuencia x (MIxS). 
 
+MIxS "Minimal Information about (X) Sequence": Es un conjunto de estándares desarrollados por el Genomic Standards Consortium (GSC) para describir datos de secuenciación con metadatos mínimos obligatorios y opcionales. La X puede ser:
+
+* Genoma (MIGS),
+* Metagenoma (MIMS),
+* Genoma ambiental (MIENS),
+* u otras variantes.
+
+Garantiza que los datos de secuenciación vengan acompañados de metadatos relevantes, como lugar y fecha de muestreo, condiciones ambientales, plataforma de secuenciación, tipo de muestra (agua, suelo, humano, etc.). Facilita la reproducibilidad, comparación entre estudios y el almacenamiento estandarizado en bases de datos públicas como ENA, NCBI o MGnify.
+
+Para más información ver:
 https://www.gensc.org
