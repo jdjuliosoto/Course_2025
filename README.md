@@ -70,18 +70,18 @@ Para un adecuado aprovechamiento del curso, es recomendable (no indispensable), 
 
 
 Referencias
-Bolstad, B. M., et al. (2003). A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. Bioinformatics, 19(2), 185–193.
-Johnson, W. E., et al. (2007). Adjusting batch effects in microarray expression data using empirical Bayes methods. Biostatistics, 8(1), 118–127.
-Leek, J. T., et al. (2010). Tackling the widespread and critical impact of batch effects in high-throughput data. Nature Reviews Genetics, 11(10), 733–739.
-Leek, J. T., & Storey, J. D. (2012). A general framework for multiple testing dependence. PNAS, 109(33), 12409–12414.
-Love, M. I., et al. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15(12), 550.
-Mortazavi, A., et al. (2008). Mapping and quantifying mammalian transcriptomes by RNA-Seq. Nature Methods, 5(7), 621–628.
-Ritchie, M. E., et al. (2015). limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Research, 43(7), e47.
-Robinson, M. D., & Oshlack, A. (2010). A scaling normalization method for differential expression analysis of RNA-seq data. Genome Biology, 11(3), R25.
-Zhao, S., et al. (2021). Evaluation of two main RNA-seq approaches for gene quantification in clinical RNA sequencing. NPJ Genomic Medicine, 6(1), 1–10.
-Zhao, S., Ye, Z. and Stanton, R. (2020) ‘Misuse of RPKM or TPM normalization when comparing across samples and sequencing protocols’. Rna, 26(8), pp.903-909. Available at: 10.1261/rna.074922.120.
-Quinn, T. P., Erb, I., Richardson, M. F., & Crowley, T. M. (2018). Understanding sequencing data as compositions: an outlook and review. Bioinformatics, 34(16), 2870–2878. Available at: https://doi.org/10.1093/bioinformatics/bty175
-Manly BF, Alberto JA. Multivariate statistical methods: a primer. Chapman and Hall/CRC; 2016 Nov 3.
-Jolliffe, I. T. (2002). Principal Component Analysis (2nd ed.). New York: Springer-Verlag.
-Pinto, M. G. Algebra Lineal con aplicaciones 7ma Stanley I Grossman.
-James R. Schott. Matrix analysis for statistics. Third edition. | Hoboken, New Jersey : John Wiley & Sons, 2016.
+1. Bolstad, B. M., et al. (2003). A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. Bioinformatics, 19(2), 185–193.
+2. Johnson, W. E., et al. (2007). Adjusting batch effects in microarray expression data using empirical Bayes methods. Biostatistics, 8(1), 118–127.
+3. Leek, J. T., et al. (2010). Tackling the widespread and critical impact of batch effects in high-throughput data. Nature Reviews Genetics, 11(10), 733–739.
+4. Leek, J. T., & Storey, J. D. (2012). A general framework for multiple testing dependence. PNAS, 109(33), 12409–12414.
+5. Love, M. I., et al. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15(12), 550.
+6. Mortazavi, A., et al. (2008). Mapping and quantifying mammalian transcriptomes by RNA-Seq. Nature Methods, 5(7), 621–628.
+7. Ritchie, M. E., et al. (2015). limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Research, 43(7), e47.
+8. Robinson, M. D., & Oshlack, A. (2010). A scaling normalization method for differential expression analysis of RNA-seq data. Genome Biology, 11(3), R25.
+9. Zhao, S., et al. (2021). Evaluation of two main RNA-seq approaches for gene quantification in clinical RNA sequencing. NPJ Genomic Medicine, 6(1), 1–10.
+10. Zhao, S., Ye, Z. and Stanton, R. (2020) ‘Misuse of RPKM or TPM normalization when comparing across samples and sequencing protocols’. Rna, 26(8), pp.903-909. Available at: 10.1261/rna.074922.120.
+11. Quinn, T. P., Erb, I., Richardson, M. F., & Crowley, T. M. (2018). Understanding sequencing data as compositions: an outlook and review. Bioinformatics, 34(16), 2870–2878. Available at: https://doi.org/10.1093/bioinformatics/bty175
+12. Manly BF, Alberto JA. Multivariate statistical methods: a primer. Chapman and Hall/CRC; 2016 Nov 3.
+13. Jolliffe, I. T. (2002). Principal Component Analysis (2nd ed.). New York: Springer-Verlag.
+14. Pinto, M. G. Algebra Lineal con aplicaciones 7ma Stanley I Grossman.
+15. James R. Schott. Matrix analysis for statistics. Third edition. | Hoboken, New Jersey : John Wiley & Sons, 2016.
