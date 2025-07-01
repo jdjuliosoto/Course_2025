@@ -666,3 +666,5 @@ adonis2(bray_dist ~ date2, data = feno, permutations = 999)
 11. Quinn, T. P., Erb, I., Richardson, M. F., & Crowley, T. M. (2018). Understanding sequencing data as compositions: an outlook and review. Bioinformatics, 34(16), 2870–2878. Available at: https://doi.org/10.1093/bioinformatics/bty175 
 12. Manly BF, Alberto JA. Multivariate statistical methods: a primer. Chapman and Hall/CRC; 2016 Nov 3.
 13. Jolliffe, I. T. (2002). Principal Component Analysis (2nd ed.). New York: Springer-Verlag.
+14. Pinto, M. G. Algebra Lineal con aplicaciones 7ma Stanley I Grossman.
+15. James R. Schott. Matrix analysis for statistics. Third edition. | Hoboken, New Jersey : John Wiley & Sons, 2016. 
