@@ -281,7 +281,13 @@ En este caso también hay que configurar Git con un nombre de usuario y un corre
 install.package("usethis")
 library(usethis)
 usethis::edit_git_config()
-# Modificar en el fichero ".gitconfig" los apartados: "name" y "email" 
+# Modificar en el fichero ".gitconfig" los apartados: "name" y "email"
+
+[user]
+	name = jdjulio
+	email = usuario@gmail.com
+
+ 
 # y guardar el fichero y puede cerrarse
 ```
 
