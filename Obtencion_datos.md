@@ -287,5 +287,5 @@ htop
 # **Ejercicio:** descargar y convertir a formato fastq 8 runs (aleatorios) del proyecto PRJNA1269778.
 ```Bash
 prefetch SRR(de acuerdo a la elección)
-fastq-dump --split-files -threads 4 (ajustar al número de nucleos del procesador) -X 10000 -O ./data/ SRR(de acuerdo a la elección)
+fastq-dump --split-files (ajustar al número de nucleos del procesador) -X 10000 -O ./data/ SRR(de acuerdo a la elección)
 ```
